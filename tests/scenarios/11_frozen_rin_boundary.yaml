@@ -1,0 +1,10 @@
+name: Fresh-frozen cell pellets at the RIN boundary (exactly 7.0 -> intact)
+state:
+  question: {goal: gene_level_de}
+  sample: {organism: human, source: cell_line, preservation: fresh_frozen, rin: 7.0}
+  design: {factors: {treatment: [DMSO, drugX]}, biological_replicates_per_group: 3}
+expect:
+  fires: [rnaseq.prep.intact_standard]
+  not_fires: [rnaseq.quality.low_rin]
+  recommended: {library.prep: polyA}
+  consult_required: false

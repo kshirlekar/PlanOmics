@@ -4,6 +4,7 @@ import pytest
 import yaml
 
 from expdesign import DesignState, evaluate
+from expdesign.rules_engine import match
 
 SCENARIOS = sorted((Path(__file__).parent / "scenarios").glob("*.yaml"))
 
@@ -35,3 +36,16 @@ def test_all_rules_well_formed():
             assert {"id", "when", "severity", "rationale", "source"} <= set(r), r.get("id")
             assert r["severity"] in {"info", "suggest", "strong", "block"}
             assert r["source"] in {"encode", "team", "literature", "facility"}
+            assert isinstance(r.get("consult", False), bool), r["id"]
+
+
+def test_unknown_operator_raises():
+    # A typo such as `ge` must fail loudly, not silently match everything.
+    with pytest.raises(ValueError):
+        match(5, {"ge": 7})
+
+
+@pytest.mark.parametrize("field,value", [("dv200", 101), ("rin", 11)])
+def test_quality_metrics_range_checked(field, value):
+    with pytest.raises(ValueError):
+        DesignState.model_validate({"sample": {field: value}})

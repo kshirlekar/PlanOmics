@@ -23,6 +23,7 @@ class Finding:
     source: str
     recommend: dict[str, Any]
     ask_if_missing: list[str] = field(default_factory=list)
+    consult: bool = False  # rule itself requests a Bioinformatics team consult
 
 
 @dataclass
@@ -44,8 +45,9 @@ class Evaluation:
 
     @property
     def consult_required(self) -> bool:
-        """Route to the Bioinformatics team: a blocking rule fired or rules conflict."""
-        return self.blocked or bool(self.conflicts())
+        """Route to the Bioinformatics team: a blocking rule fired, a rule asks for a
+        consult, or rules conflict."""
+        return self.blocked or any(f.consult for f in self.findings) or bool(self.conflicts())
 
     def by_id(self) -> dict[str, Finding]:
         return {f.rule_id: f for f in self.findings}
@@ -89,8 +91,14 @@ def get_path(data: dict, dotted: str) -> Any:
     return _MISSING if cur is None else cur
 
 
+OPERATORS = {"exists", "in", "gt", "gte", "lt", "lte"}
+
+
 def match(value: Any, cond: Any) -> bool:
     if isinstance(cond, dict):
+        unknown = set(cond) - OPERATORS
+        if unknown:
+            raise ValueError(f"Unknown rule operator(s): {sorted(unknown)}")
         for op, arg in cond.items():
             if op == "exists":
                 if (value is not _MISSING) != bool(arg):
@@ -103,6 +111,10 @@ def match(value: Any, cond: Any) -> bool:
             if op == "gt" and not value > arg:
                 return False
             if op == "lt" and not value < arg:
+                return False
+            if op == "gte" and not value >= arg:
+                return False
+            if op == "lte" and not value <= arg:
                 return False
         return True
     return value is not _MISSING and value == cond
@@ -135,6 +147,7 @@ def evaluate(state: DesignState) -> Evaluation:
                 source=rule["source"],
                 recommend=rule.get("recommend") or {},
                 ask_if_missing=rule.get("ask_if_missing", []),
+                consult=bool(rule.get("consult", False)),
             )
             findings.append(f)
             missing += [p for p in f.ask_if_missing if get_path(data, p) is _MISSING and p not in missing]

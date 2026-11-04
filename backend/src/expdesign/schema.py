@@ -31,8 +31,8 @@ class Sample(BaseModel):
         "sorted_cells", "organoid", "pdx", "other"]] = None
     preservation: Optional[Literal["fresh", "fresh_frozen", "ffpe", "rnalater", "other"]] = None
     collection_tube: Optional[Literal["paxgene", "tempus", "edta", "other"]] = None
-    rin: Optional[float] = None
-    dv200: Optional[float] = None
+    rin: Optional[float] = Field(None, ge=0, le=10)       # RNA Integrity Number, 0-10
+    dv200: Optional[float] = Field(None, ge=0, le=100)    # % of RNA fragments >200 nt (percent, not fraction)
     input_ng: Optional[float] = None
     passage_range: Optional[str] = None
     str_authenticated: Optional[bool] = None

@@ -1,0 +1,11 @@
+name: FFPE archive, severely degraded (DV200 22%)
+state:
+  question: {goal: gene_level_de}
+  sample: {organism: human, source: patient_tissue, preservation: ffpe, dv200: 22}
+  design: {factors: {stage: [early, late]}, biological_replicates_per_group: 12}
+expect:
+  fires: [rnaseq.prep.degraded, rnaseq.quality.dv200_low]
+  not_fires: [rnaseq.quality.dv200_moderate]
+  recommended: {library.prep: rRNA_depletion}
+  consult_required: true
+  blocked: false

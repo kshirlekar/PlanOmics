@@ -1,0 +1,11 @@
+name: Fresh-frozen tumor, partially degraded (RIN 5.5), DV200 not yet measured
+state:
+  question: {goal: gene_level_de}
+  sample: {organism: mouse, source: animal_tissue, preservation: fresh_frozen, rin: 5.5}
+  design: {factors: {genotype: [WT, KO]}, biological_replicates_per_group: 5}
+expect:
+  fires: [rnaseq.quality.low_rin]
+  not_fires: [rnaseq.prep.intact_standard]
+  recommended: {library.prep: rRNA_depletion}
+  missing_includes: [sample.dv200]
+  consult_required: false

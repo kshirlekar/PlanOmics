@@ -27,8 +27,42 @@ rules:
     ask_if_missing: [sample.dv200]
     source: team
 
+  # --- RNA integrity gate (thresholds: team-adopted, derived from vendor guidance; not ENCODE) ---
+  - id: rnaseq.quality.low_rin
+    when: {sample.preservation: {in: [fresh_frozen, fresh]}, sample.rin: {lt: 7}}
+    recommend: {library.prep: rRNA_depletion}
+    severity: suggest
+    rationale: >
+      RIN below 7 indicates partial degradation. Poly(A) capture then biases coverage toward
+      the 3' end; rRNA depletion is more robust to degradation. Also measure DV200, which is
+      more informative than RIN for degraded RNA.
+    ask_if_missing: [sample.dv200]
+    source: team
+
+  - id: rnaseq.quality.dv200_low
+    when: {sample.dv200: {lt: 30}}
+    recommend: {library.prep: rRNA_depletion}
+    severity: strong
+    consult: true
+    rationale: >
+      DV200 below 30% means most RNA fragments are shorter than 200 nt. Library yield and
+      complexity are likely to be poor and many samples may fail. Discuss with the
+      Bioinformatics team before committing samples (re-extraction, more input, or excluding
+      samples). Threshold adopted by the team from library-kit vendor guidance; not an ENCODE standard.
+    source: team
+
+  - id: rnaseq.quality.dv200_moderate
+    when: {sample.dv200: {gte: 30, lt: 50}}
+    recommend: {library.prep: rRNA_depletion}
+    severity: info
+    rationale: >
+      DV200 of 30-50% indicates moderately degraded RNA. rRNA depletion is appropriate; expect
+      lower library complexity than intact RNA. Threshold adopted by the team from library-kit
+      vendor guidance; not an ENCODE standard.
+    source: team
+
   - id: rnaseq.prep.intact_standard
-    when: {sample.preservation: {in: [fresh_frozen, fresh]}, question.goal: gene_level_de, sample.rin: {gt: 7}}
+    when: {sample.preservation: {in: [fresh_frozen, fresh]}, question.goal: gene_level_de, sample.rin: {gte: 7}}
     recommend: {library.prep: polyA}
     severity: suggest
     rationale: "Intact RNA and a gene-level question: poly(A) selection is the standard, cost-effective choice."

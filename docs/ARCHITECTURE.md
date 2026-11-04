@@ -39,6 +39,9 @@ User ↔ Frontend (stepper · chat · live design card · review/export)
 ```
 
 `severity: block` means the design cannot be exported without resolving it or requesting a consult.
+An optional `consult: true` flags the design for a Bioinformatics team consult without blocking export.
+
+`when` operators: equality, `{in: [...]}`, `{gt|gte|lt|lte: n}`, `{exists: bool}`. Unknown operators raise an error.
 
 **Conflicts.** When several rules recommend a value for the same field, the highest severity wins.
 If rules of the *same* top severity recommend *different* values (e.g. FFPE → `rRNA_depletion`
