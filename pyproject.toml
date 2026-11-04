@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "expdesign"
+version = "0.1.0"
+description = "Guided omics experiment-design assistant (UF Health Cancer Institute)"
+requires-python = ">=3.11"
+dependencies = ["pydantic>=2.6", "pyyaml>=6"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+app = ["fastapi>=0.110", "uvicorn[standard]>=0.29", "openai>=1.30", "jinja2>=3.1", "python-dotenv>=1.0"]
+
+[tool.setuptools.packages.find]
+where = ["backend/src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["backend/src"]

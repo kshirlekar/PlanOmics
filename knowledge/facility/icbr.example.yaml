@@ -1,0 +1,17 @@
+# EXAMPLE VALUES ONLY — placeholders for development. Replace with current facility data.
+facility: ICBR (example)
+currency: USD
+last_verified: null
+library_prep:
+  polyA: {price_per_sample: 100}
+  rRNA_depletion: {price_per_sample: 150}
+  low_input_full_length: {price_per_sample: 200}
+add_ons:
+  globin_depletion: {price_per_sample: 40}
+sequencing:
+  - {instrument: "Example flow cell A", reads: 400000000, price: 2000}
+  - {instrument: "Example flow cell B", reads: 1200000000, price: 4500}
+submission:
+  min_rin: 7
+  min_dv200_ffpe: 0.3
+  turnaround_weeks: [3, 5]

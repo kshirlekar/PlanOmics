@@ -1,0 +1,10 @@
+name: Degron time course with expected global transcriptional change
+state:
+  question: {goal: gene_level_de, expected_global_transcription_change: true}
+  sample: {organism: human, source: cell_line, preservation: fresh_frozen, rin: 9.8}
+  design: {factors: {genotype: [WT, dLBD], time: [0h, 2h, 6h, 24h]}, biological_replicates_per_group: 3}
+expect:
+  fires: [rnaseq.spikein.global_change]
+  not_fires: [rnaseq.spikein.not_needed, core.replicates.minimum]
+  recommended: {library.spike_in: ERCC_per_cell_number}
+  missing_includes: [sample.cell_counts_available]

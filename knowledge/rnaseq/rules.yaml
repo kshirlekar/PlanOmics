@@ -1,0 +1,91 @@
+# Bulk RNA-seq module rulebook (starter). Team review required before v1.0.
+version: "0.1.0"
+rules:
+  - id: rnaseq.depth.gene_level
+    when: {question.goal: gene_level_de, library.prep: {in: [polyA, rRNA_depletion]}}
+    recommend: {sequencing.target_reads_per_sample: 30000000}
+    severity: suggest
+    rationale: >
+      ENCODE4 targets 30M aligned reads per replicate for bulk RNA-seq (20M in older
+      projects). For DE, additional replicates add more power than depth beyond ~20-30M.
+    source: encode
+
+  - id: rnaseq.depth.isoform
+    when: {question.goal: {in: [isoform, splicing, fusion]}}
+    recommend: {sequencing.target_reads_per_sample: 60000000, sequencing.paired_end: true}
+    severity: strong
+    rationale: "Isoform/splicing/fusion analyses need paired-end reads and greater depth than gene-level DE."
+    source: team
+
+  - id: rnaseq.prep.degraded
+    when: {sample.preservation: ffpe}
+    recommend: {library.prep: rRNA_depletion}
+    severity: strong
+    rationale: >
+      FFPE RNA is fragmented; poly(A) capture loses 5' coverage. Use rRNA depletion and
+      assess quality by DV200 rather than RIN.
+    ask_if_missing: [sample.dv200]
+    source: team
+
+  - id: rnaseq.prep.intact_standard
+    when: {sample.preservation: {in: [fresh_frozen, fresh]}, question.goal: gene_level_de, sample.rin: {gt: 7}}
+    recommend: {library.prep: polyA}
+    severity: suggest
+    rationale: "Intact RNA and a gene-level question: poly(A) selection is the standard, cost-effective choice."
+    source: team
+
+  - id: rnaseq.prep.whole_blood_globin
+    when: {sample.source: whole_blood}
+    recommend: {library.globin_depletion: true}
+    severity: strong
+    rationale: >
+      Globin transcripts can consume a large share of reads in whole blood, reducing
+      effective depth for other genes.
+    ask_if_missing: [sample.collection_tube]
+    source: team
+
+  - id: rnaseq.prep.pbmc
+    when: {sample.source: pbmc}
+    recommend: {library.globin_depletion: false}
+    severity: info
+    rationale: "PBMCs generally do not need globin depletion; note any RBC contamination during isolation."
+    source: team
+
+  - id: rnaseq.pdx.host_reads
+    when: {sample.source: pdx}
+    recommend: {analysis.host_read_removal: true}
+    severity: strong
+    rationale: "PDX tissue contains mouse stroma; plan computational removal of mouse reads (e.g. combined reference)."
+    source: team
+
+  - id: rnaseq.spikein.global_change
+    when: {question.expected_global_transcription_change: true}
+    recommend: {library.spike_in: ERCC_per_cell_number}
+    severity: strong
+    rationale: >
+      Standard normalization assumes most genes are unchanged. If the perturbation may shift
+      total transcription (e.g. degrons of global regulators, transcription inhibitors),
+      add spike-ins proportional to cell number, not to RNA mass.
+    ask_if_missing: [sample.cell_counts_available]
+    source: team
+
+  - id: rnaseq.spikein.not_needed
+    when: {question.expected_global_transcription_change: false, question.goal: gene_level_de}
+    recommend: {library.spike_in: none}
+    severity: info
+    rationale: "Spike-ins are not required for standard differential expression."
+    source: team
+
+  - id: rnaseq.knockdown.control
+    when: {design.perturbation_type: {in: [shRNA, siRNA, CRISPR_KO, CRISPRi]}}
+    recommend: {design.matched_nontargeting_control: true}
+    severity: strong
+    rationale: "ENCODE requires a matched control experiment for knockdown/CRISPR RNA-seq; include non-targeting controls."
+    source: encode
+
+  - id: rnaseq.low_input
+    when: {sample.input_ng: {lt: 10}}
+    recommend: {library.prep: low_input_full_length, library.umi: true}
+    severity: strong
+    rationale: "Very low input libraries have high duplication; use a low-input chemistry and UMIs."
+    source: team

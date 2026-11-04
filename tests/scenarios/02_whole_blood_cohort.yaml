@@ -1,0 +1,9 @@
+name: Whole-blood patient cohort, pre/post treatment
+state:
+  question: {goal: gene_level_de}
+  sample: {organism: human, source: whole_blood, preservation: fresh_frozen}
+  design: {factors: {timepoint: [pre, post]}, biological_replicates_per_group: 12, paired: true}
+expect:
+  fires: [rnaseq.prep.whole_blood_globin, core.human_subjects]
+  recommended: {library.globin_depletion: true}
+  missing_includes: [sample.collection_tube, project.irb_status]

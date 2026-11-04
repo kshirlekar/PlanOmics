@@ -1,0 +1,10 @@
+name: FFPE tumor archive
+state:
+  question: {goal: gene_level_de}
+  sample: {organism: human, source: patient_tissue, preservation: ffpe}
+  design: {factors: {response: [responder, nonresponder]}, biological_replicates_per_group: 15}
+expect:
+  fires: [rnaseq.prep.degraded]
+  not_fires: [rnaseq.prep.intact_standard]
+  recommended: {library.prep: rRNA_depletion}
+  missing_includes: [sample.dv200]

@@ -1,0 +1,9 @@
+name: PDX tumors, vehicle vs treatment
+state:
+  question: {goal: gene_level_de}
+  sample: {organism: human, source: pdx, preservation: fresh_frozen, rin: 8}
+  design: {factors: {treatment: [vehicle, drugY]}, biological_replicates_per_group: 5, batch_confounded_with_condition: true}
+expect:
+  fires: [rnaseq.pdx.host_reads, core.batch.confounded]
+  blocked: true
+  recommended: {analysis.host_read_removal: true}

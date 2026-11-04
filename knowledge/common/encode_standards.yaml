@@ -1,0 +1,30 @@
+# ENCODE data standards used as QC floors. See docs/ENCODE_REFERENCES.md.
+# Re-verify against the source pages at every rulebook release.
+version: "ENCODE4 (checked 2026-11-04)"
+
+bulk_rnaseq:
+  source: https://www.encodeproject.org/data-standards/rna-seq/long-rnas/
+  min_replicates: 2
+  aligned_reads_per_replicate: 30000000
+  aligned_reads_per_replicate_legacy: 20000000
+  knockdown_or_crispr_aligned_reads_per_replicate: 10000000
+  replicate_spearman_isogenic: 0.9
+  replicate_spearman_anisogenic: 0.8
+  spike_in: {product: "ERCC (Ambion) Mix 1", target_fraction_of_mapped_reads: 0.02}
+
+atacseq:
+  source: https://www.encodeproject.org/atac-seq/
+  min_replicates: 2
+  min_read_length_bp: 45
+  nondup_nonmito_fragments_per_replicate: 25000000
+  tss_enrichment_grch38: {concerning_below: 5, acceptable: [5, 7], ideal_above: 7}
+  frip: {ideal_above: 0.3, acceptable_above: 0.2}
+
+histone_chipseq:
+  source: https://www.encodeproject.org/chip-seq/histone-encode4/
+  min_replicates: 2
+  narrow_mark_usable_fragments: 20000000
+  broad_mark_usable_fragments: 45000000
+  broad_mark_usable_fragments_acceptable: 35000000
+  requires_matched_control: true
+  note: "No ENCODE standard exists for CUT&RUN/CUT&Tag; do not cite these depths for them."

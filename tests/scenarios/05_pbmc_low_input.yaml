@@ -1,0 +1,9 @@
+name: Sorted PBMC subsets, low input
+state:
+  question: {goal: gene_level_de}
+  sample: {organism: human, source: pbmc, preservation: fresh_frozen, input_ng: 2}
+  design: {factors: {subset: [CD4, CD8]}, biological_replicates_per_group: 6}
+expect:
+  fires: [rnaseq.prep.pbmc, rnaseq.low_input]
+  not_fires: [rnaseq.prep.whole_blood_globin]
+  recommended: {library.globin_depletion: false, library.prep: low_input_full_length, library.umi: true}

@@ -1,0 +1,39 @@
+# Rules shared by every assay. Operators in `when`: equality, {in: [...]}, {gt: n}, {lt: n}, {exists: bool}
+version: "0.1.0"
+rules:
+  - id: core.replicates.minimum
+    when: {design.biological_replicates_per_group: {lt: 3}}
+    recommend: {design.biological_replicates_per_group: 3}
+    severity: strong
+    rationale: >
+      Differential testing needs at least 3 biological replicates per group to estimate
+      biological variance. ENCODE's minimum of 2 targets reproducibility of reference data,
+      not statistical power.
+    source: team
+
+  - id: core.cell_line.replicate_definition
+    when: {sample.source: cell_line}
+    recommend: {}
+    severity: info
+    rationale: >
+      For cell lines, biological replicates are independent cultures (separate passages
+      or thaws, processed on different days), not wells split from one flask.
+    ask_if_missing: [sample.passage_range, sample.str_authenticated, sample.mycoplasma_tested]
+    source: team
+
+  - id: core.batch.confounded
+    when: {design.batch_confounded_with_condition: true}
+    recommend: {}
+    severity: block
+    rationale: >
+      Condition is fully confounded with processing batch; the effect of treatment cannot
+      be separated from batch. Re-balance so each batch contains every condition.
+    source: team
+
+  - id: core.human_subjects
+    when: {sample.organism: human, sample.source: {in: [patient_tissue, whole_blood, pbmc]}}
+    recommend: {}
+    severity: info
+    rationale: "Human subject material: confirm IRB status. Do not enter PHI in this tool."
+    ask_if_missing: [project.irb_status]
+    source: team

@@ -1,0 +1,13 @@
+name: Cell-line drug treatment, 2 lines x 2 treatments x 2 timepoints
+state:
+  question: {goal: gene_level_de, expected_global_transcription_change: false}
+  sample: {organism: human, source: cell_line, preservation: fresh_frozen, rin: 9.5}
+  design:
+    factors: {cell_line: [A375, SKMEL28], treatment: [DMSO, drugX], time: [24h, 72h]}
+    biological_replicates_per_group: 2
+  library: {prep: polyA}
+expect:
+  fires: [core.replicates.minimum, core.cell_line.replicate_definition, rnaseq.prep.intact_standard, rnaseq.depth.gene_level, rnaseq.spikein.not_needed]
+  not_fires: [rnaseq.prep.whole_blood_globin, rnaseq.spikein.global_change]
+  recommended: {design.biological_replicates_per_group: 3, library.prep: polyA, sequencing.target_reads_per_sample: 30000000}
+  missing_includes: [sample.passage_range, sample.str_authenticated]
