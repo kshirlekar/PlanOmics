@@ -40,6 +40,12 @@ User ↔ Frontend (stepper · chat · live design card · review/export)
 
 `severity: block` means the design cannot be exported without resolving it or requesting a consult.
 
+**Conflicts.** When several rules recommend a value for the same field, the highest severity wins.
+If rules of the *same* top severity recommend *different* values (e.g. FFPE → `rRNA_depletion`
+vs. <10 ng input → `low_input_full_length`, both `strong`), the engine does not choose: the field
+is left out of the recommendations, reported as a conflict, and the design is flagged
+`consult_required` for the Bioinformatics team.
+
 ## Interview order (RNA-seq)
 
 Project context → biological question → sample type and quality → library prep → conditions and replicates → controls and spike-ins → batches and randomization → sequencing → QC and submission → budget/timeline → analysis plan → review/export.

@@ -26,6 +26,14 @@ class Finding:
 
 
 @dataclass
+class Conflict:
+    """Rules of equal (top) severity recommend different values for one field."""
+    field: str
+    severity: str
+    options: dict[str, Any]  # rule_id -> recommended value
+
+
+@dataclass
 class Evaluation:
     findings: list[Finding]
     missing: list[str]
@@ -34,18 +42,42 @@ class Evaluation:
     def blocked(self) -> bool:
         return any(f.severity == "block" for f in self.findings)
 
+    @property
+    def consult_required(self) -> bool:
+        """Route to the Bioinformatics team: a blocking rule fired or rules conflict."""
+        return self.blocked or bool(self.conflicts())
+
     def by_id(self) -> dict[str, Finding]:
         return {f.rule_id: f for f in self.findings}
 
-    def recommended(self) -> dict[str, Any]:
-        """Merged recommendations; higher severity wins on conflict."""
-        out: dict[str, tuple[int, Any]] = {}
+    def _top_recommendations(self) -> dict[str, tuple[int, dict[str, Any]]]:
+        """Per field: the highest severity seen and {rule_id: value} at that severity."""
+        top: dict[str, tuple[int, dict[str, Any]]] = {}
         for f in self.findings:
+            s = SEVERITY_ORDER[f.severity]
             for k, v in f.recommend.items():
-                s = SEVERITY_ORDER[f.severity]
-                if k not in out or s >= out[k][0]:
-                    out[k] = (s, v)
-        return {k: v for k, (_, v) in out.items()}
+                if k not in top or s > top[k][0]:
+                    top[k] = (s, {f.rule_id: v})
+                elif s == top[k][0]:
+                    top[k][1][f.rule_id] = v
+        return top
+
+    def conflicts(self) -> list[Conflict]:
+        names = {v: k for k, v in SEVERITY_ORDER.items()}
+        return [
+            Conflict(field=k, severity=names[s], options=opts)
+            for k, (s, opts) in self._top_recommendations().items()
+            if len({repr(v) for v in opts.values()}) > 1
+        ]
+
+    def recommended(self) -> dict[str, Any]:
+        """Merged recommendations. Higher severity wins; equal-severity disagreements
+        are never resolved silently: the field is omitted and reported in conflicts()."""
+        return {
+            k: next(iter(opts.values()))
+            for k, (_, opts) in self._top_recommendations().items()
+            if len({repr(v) for v in opts.values()}) == 1
+        }
 
 
 def get_path(data: dict, dotted: str) -> Any:

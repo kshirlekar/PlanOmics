@@ -53,6 +53,14 @@ Exit criterion: all golden scenarios pass and two teammates agree with the recom
 19. **RAG (optional)** — over ICBR submission docs, team SOPs, kit manuals, curated methods papers, for citations and ad hoc Q&A.
 20. **Public launch on the bioinformatics website** + consult-request handoff.
 
+## Later enhancements (post-v1)
+
+- **`vendor` rule source.** Kit/instrument manufacturer guidance (Illumina, 10x Genomics, Takara, etc.)
+  is neither facility policy nor peer-reviewed literature. Add `vendor` to the allowed `source` values,
+  with kit name + document version in the rule, and re-tag rules that currently cite vendor-derived
+  thresholds under `team`. Deferred: vendor specs are kit-specific and change often, so they need a
+  versioning/refresh process first.
+
 ## Decisions to make early
 
 - [ ] Facility scope: ICBR-specific vs facility-agnostic with an ICBR profile (recommended: agnostic + profile)

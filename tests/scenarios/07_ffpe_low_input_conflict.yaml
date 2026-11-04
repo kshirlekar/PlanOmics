@@ -1,0 +1,11 @@
+name: FFPE biopsy, very low input (equal-severity prep conflict)
+state:
+  question: {goal: gene_level_de}
+  sample: {organism: human, source: patient_tissue, preservation: ffpe, input_ng: 5}
+  design: {factors: {response: [responder, nonresponder]}, biological_replicates_per_group: 8}
+expect:
+  fires: [rnaseq.prep.degraded, rnaseq.low_input]
+  conflicts: [library.prep]          # rRNA_depletion vs low_input_full_length, both strong
+  recommended: {library.umi: true}   # non-conflicting fields still recommended
+  consult_required: true
+  blocked: false

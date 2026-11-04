@@ -22,6 +22,11 @@ def test_golden_scenario(path):
     assert set(exp.get("missing_includes", [])) <= set(result.missing)
     if "blocked" in exp:
         assert result.blocked == exp["blocked"]
+    conflicted = {c.field for c in result.conflicts()}
+    assert conflicted == set(exp.get("conflicts", [])), f"conflicts: {conflicted}"
+    assert not (conflicted & set(rec)), "conflicted fields must not be silently recommended"
+    if "consult_required" in exp:
+        assert result.consult_required == exp["consult_required"]
 
 
 def test_all_rules_well_formed():
