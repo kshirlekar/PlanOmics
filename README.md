@@ -49,6 +49,7 @@ pytest                      # runs golden scenarios through the rules engine
 
 - [Implementation plan](docs/IMPLEMENTATION_PLAN.md)
 - [Architecture](docs/ARCHITECTURE.md)
+- [Workflow and rule map](docs/WORKFLOW.md) (generated: `python tools/build_workflow.py`)
 - [Infrastructure and credentials](docs/INFRASTRUCTURE.md)
 - [ENCODE references and how we use them](docs/ENCODE_REFERENCES.md)
 
