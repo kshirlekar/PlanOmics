@@ -1,0 +1,10 @@
+name: lncRNA question with very low input (prep conflict -> consult)
+state:
+  question: {goal: lncRNA}
+  sample: {organism: human, source: sorted_cells, preservation: fresh_frozen, input_ng: 3, sex: both}
+  design: {factors: {subset: [Treg, Tconv]}, biological_replicates_per_group: 4, sex_balanced: true}
+expect:
+  fires: [rnaseq.lncrna.library, rnaseq.low_input, core.sorted_cells.replicate_definition]
+  conflicts: [library.prep]
+  recommended: {library.umi: true, library.stranded: true}
+  consult_required: true

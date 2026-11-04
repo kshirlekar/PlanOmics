@@ -1,0 +1,11 @@
+name: CRISPR knockout vs non-targeting, polyA
+state:
+  question: {goal: gene_level_de, expected_global_transcription_change: false}
+  sample: {organism: human, source: cell_line, preservation: fresh_frozen, rin: 9.2}
+  design: {factors: {guide: [NT, sgGENE1, sgGENE2]}, biological_replicates_per_group: 3, perturbation_type: CRISPR_KO}
+  library: {prep: polyA, stranded: true}
+expect:
+  fires: [rnaseq.knockdown.control, rnaseq.knockdown.depth_floor, rnaseq.depth.gene_level]
+  # the 10M ENCODE floor is informational and must not compete with the 30M DE target
+  recommended: {design.matched_nontargeting_control: true, sequencing.target_reads_per_sample: 30000000}
+  consult_required: false

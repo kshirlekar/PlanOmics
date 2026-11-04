@@ -1,0 +1,9 @@
+name: Strandedness not yet chosen -> default to stranded
+state:
+  question: {goal: gene_level_de}
+  sample: {organism: human, source: organoid, preservation: fresh_frozen, rin: 9}
+  design: {factors: {treatment: [vehicle, drugZ]}, biological_replicates_per_group: 4}
+expect:
+  fires: [rnaseq.library.stranded_default]
+  not_fires: [rnaseq.library.unstranded]
+  recommended: {library.stranded: true}

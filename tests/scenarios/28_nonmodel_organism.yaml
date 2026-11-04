@@ -1,0 +1,10 @@
+name: Non-model organism -> reference genome consult
+state:
+  question: {goal: gene_level_de}
+  sample: {organism: other, source: animal_tissue, preservation: rnalater}
+  design: {factors: {condition: [control, heat_stress]}, biological_replicates_per_group: 5}
+expect:
+  fires: [core.organism.other, core.animal.replicate_definition]
+  not_fires: [core.sabv.ask]
+  consult_required: true
+  blocked: false

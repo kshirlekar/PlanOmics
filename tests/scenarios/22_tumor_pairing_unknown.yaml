@@ -1,0 +1,9 @@
+name: Tumor biopsies, pairing not stated -> ask
+state:
+  question: {goal: gene_level_de}
+  sample: {organism: human, source: patient_tissue, preservation: fresh_frozen, rin: 7.8, sex: both}
+  design: {factors: {tissue: [tumor, adjacent_normal]}, biological_replicates_per_group: 10}
+expect:
+  fires: [core.design.pairing_question, core.sabv.both_sexes]
+  missing_includes: [design.paired, design.sex_balanced]
+  recommended: {design.sex_balanced: true}

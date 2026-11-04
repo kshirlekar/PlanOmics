@@ -1,0 +1,11 @@
+name: PI requests unstranded library to match an old dataset
+state:
+  question: {goal: gene_level_de, expected_global_transcription_change: false}
+  sample: {organism: mouse, source: animal_tissue, preservation: fresh_frozen, rin: 8.5}
+  design: {factors: {diet: [chow, HFD]}, biological_replicates_per_group: 6}
+  library: {prep: polyA, stranded: false}
+expect:
+  fires: [rnaseq.library.unstranded]
+  not_fires: [rnaseq.library.stranded_default]
+  recommended: {library.stranded: true}
+  consult_required: false

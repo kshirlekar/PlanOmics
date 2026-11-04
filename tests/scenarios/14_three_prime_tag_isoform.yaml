@@ -1,0 +1,12 @@
+name: 3' tag library chosen for a splicing question (incompatible)
+state:
+  question: {goal: splicing}
+  sample: {organism: human, source: cell_line, preservation: fresh_frozen, rin: 9.4}
+  design: {factors: {genotype: [WT, SF3B1_K700E]}, biological_replicates_per_group: 3}
+  library: {prep: three_prime_tag, stranded: true}
+expect:
+  fires: [rnaseq.prep.three_prime_tag_incompatible, rnaseq.depth.isoform, rnaseq.depth.three_prime_tag]
+  # isoform rule (strong) outranks 3' tag depth (suggest), so no conflict on depth / paired_end
+  recommended: {sequencing.target_reads_per_sample: 60000000, sequencing.paired_end: true}
+  blocked: true
+  consult_required: true

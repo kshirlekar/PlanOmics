@@ -1,0 +1,11 @@
+name: Mouse knockout, both sexes
+state:
+  question: {goal: gene_level_de, expected_global_transcription_change: false}
+  sample: {organism: mouse, source: animal_tissue, preservation: fresh_frozen, rin: 8.8, sex: both}
+  design: {factors: {genotype: [WT, KO]}, biological_replicates_per_group: 6, sex_balanced: true}
+  library: {prep: polyA, stranded: true}
+expect:
+  fires: [core.sabv.both_sexes, core.animal.replicate_definition]
+  not_fires: [core.sabv.single_sex, core.design.pairing_question]
+  recommended: {design.sex_balanced: true}
+  consult_required: false

@@ -123,3 +123,99 @@ rules:
     severity: strong
     rationale: "Very low input libraries have high duplication; use a low-input chemistry and UMIs."
     source: team
+
+  # --- Rule 2: strandedness ---
+  - id: rnaseq.library.stranded_default
+    when: {library.stranded: {exists: false}}
+    recommend: {library.stranded: true}
+    severity: info
+    rationale: >
+      Stranded libraries record which DNA strand each transcript came from. This resolves
+      overlapping and antisense genes and is required to quantify antisense/lncRNA
+      transcription. Stranded kits are now the default at most cores at little or no extra cost.
+    source: team
+
+  - id: rnaseq.library.unstranded
+    when: {library.stranded: false}
+    recommend: {library.stranded: true}
+    severity: suggest
+    rationale: >
+      An unstranded library cannot assign reads to the correct strand where genes overlap on
+      opposite strands, which mis-assigns counts for a few percent of genes and rules out
+      antisense analysis. Use unstranded only to match an existing unstranded dataset.
+    source: team
+
+  # --- Rule 3: 3' tag-counting libraries (e.g. QuantSeq, BRB-seq) ---
+  - id: rnaseq.prep.three_prime_tag_incompatible
+    when: {library.prep: three_prime_tag, question.goal: {in: [isoform, splicing, fusion, lncRNA]}}
+    recommend: {}
+    severity: block
+    rationale: >
+      3' tag libraries sequence only the 3' end of polyadenylated transcripts. They cannot
+      resolve isoforms, splice junctions or fusions, and miss non-polyadenylated lncRNAs.
+      Use a full-length library (poly(A) or rRNA depletion) for this question.
+    source: team
+
+  - id: rnaseq.prep.three_prime_tag_option
+    when: {question.goal: gene_level_de, design.n_samples: {gte: 96}, library.prep: {exists: false}}
+    recommend: {}
+    severity: info
+    rationale: >
+      With 96 or more samples and a gene-level question, a 3' tag-counting library is a
+      cost-effective option: lower per-sample library cost and roughly 5-10M reads per sample.
+      Trade-offs: no isoform information, and 3' bias makes it less suitable for degraded RNA
+      from some sources. Discuss with the Bioinformatics team if budget is the constraint.
+    source: team
+
+  - id: rnaseq.depth.three_prime_tag
+    when: {library.prep: three_prime_tag}
+    recommend: {sequencing.target_reads_per_sample: 10000000, sequencing.paired_end: false}
+    severity: suggest
+    rationale: >
+      3' tag libraries yield one read per transcript end, so gene-level counts saturate at
+      lower depth than full-length libraries; about 10M reads per sample, single-end, is
+      sufficient. Not an ENCODE standard (ENCODE does not cover 3' tag RNA-seq).
+    source: team
+
+  # --- Rule 4: knockdown / CRISPR depth floor ---
+  - id: rnaseq.knockdown.depth_floor
+    when: {design.perturbation_type: {in: [shRNA, siRNA, CRISPR_KO, CRISPRi]}}
+    recommend: {}
+    severity: info
+    rationale: >
+      ENCODE's floor for knockdown/CRISPR RNA-seq is 10M aligned reads per replicate. That is a
+      QC minimum for detecting the targeted knockdown, not a target for genome-wide DE; the
+      gene-level depth recommendation (30M) still applies.
+    source: encode
+
+  # --- Rule 5: ERCC spike-in amount ---
+  - id: rnaseq.spikein.ercc_fraction
+    when: {library.spike_in: {in: [ERCC, ERCC_per_cell_number]}}
+    recommend: {library.spike_in_target_fraction: 0.02}
+    severity: suggest
+    rationale: >
+      ENCODE uses ERCC (Ambion) Mix 1 at about 2% of mapped reads. Too little gives noisy
+      spike-in estimates; too much wastes sequencing depth on spike-ins.
+    source: encode
+
+  # --- Rule 6: lncRNA ---
+  - id: rnaseq.lncrna.library
+    when: {question.goal: lncRNA}
+    recommend: {library.prep: rRNA_depletion, library.stranded: true, sequencing.target_reads_per_sample: 50000000}
+    severity: strong
+    rationale: >
+      Many lncRNAs are not polyadenylated, are often antisense to coding genes, and are
+      expressed at low levels. Use rRNA depletion (keeps non-polyadenylated RNA), a stranded
+      library (resolves antisense transcripts) and deeper sequencing (~50M reads).
+    source: team
+
+  # --- Whole-blood collection tube ---
+  - id: rnaseq.blood.edta_tube
+    when: {sample.source: whole_blood, sample.collection_tube: edta}
+    recommend: {}
+    severity: suggest
+    rationale: >
+      EDTA tubes do not stabilize RNA; transcript profiles change within hours at room
+      temperature. Prefer RNA-stabilizing tubes (PAXgene, Tempus). If EDTA is unavoidable,
+      standardize and record time-to-processing for every sample.
+    source: team

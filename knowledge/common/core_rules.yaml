@@ -38,3 +38,111 @@ rules:
     rationale: "Human subject material: confirm IRB status. Do not enter PHI in this tool."
     ask_if_missing: [project.irb_status]
     source: team
+
+  # --- Replicates: n = 1 ---
+  - id: core.replicates.none
+    when: {design.biological_replicates_per_group: {lt: 2}}
+    recommend: {design.biological_replicates_per_group: 3}
+    severity: block
+    rationale: >
+      With one sample per group, biological variance cannot be estimated, so no statistical
+      test of differential expression is valid and results cannot be called reproducible.
+      This applies even to pilot studies.
+    source: team
+
+  # --- Paired / matched designs ---
+  - id: core.design.pairing_question
+    when: {sample.source: {in: [patient_tissue, whole_blood, pbmc, pdx]}, design.paired: {exists: false}}
+    recommend: {}
+    severity: info
+    rationale: >
+      Samples from the same patient, donor or PDX line (e.g. pre/post treatment, tumor/normal)
+      are paired. Pairing removes between-individual variation from the comparison and changes
+      both the analysis model and the power estimate, so it must be known up front.
+    ask_if_missing: [design.paired]
+    source: team
+
+  - id: core.design.paired_model
+    when: {design.paired: true}
+    recommend: {}
+    severity: suggest
+    rationale: >
+      Paired design: include the pairing unit (patient, donor, litter) as a blocking term in the
+      model, e.g. ~ patient + condition, and keep both samples of a pair in the same processing
+      batch where possible. Losing one sample of a pair weakens the paired comparison.
+    ask_if_missing: [design.pairing_factor]
+    source: team
+
+  # --- Sex as a biological variable (NIH NOT-OD-15-102) ---
+  - id: core.sabv.ask
+    when: {sample.organism: {in: [human, mouse, rat]}}
+    recommend: {}
+    severity: info
+    rationale: >
+      NIH expects sex to be considered as a biological variable in vertebrate animal and human
+      studies (NOT-OD-15-102), and reviewers assess it under Rigor. Record the sex of subjects,
+      animals or cell lines; it is also a useful QC check (XIST / Y-chromosome genes).
+    ask_if_missing: [sample.sex]
+    source: literature
+
+  - id: core.sabv.both_sexes
+    when: {sample.sex: both}
+    recommend: {design.sex_balanced: true}
+    severity: suggest
+    rationale: >
+      Balance sex across conditions so sex is not confounded with treatment, and include sex
+      as a covariate in the model. Testing sex differences themselves needs a larger design.
+    ask_if_missing: [design.sex_balanced]
+    source: team
+
+  - id: core.sabv.single_sex
+    when: {sample.organism: {in: [mouse, rat]}, sample.sex: {in: [male, female]}}
+    recommend: {}
+    severity: info
+    rationale: >
+      Single-sex animal studies need a stated justification in NIH applications (NOT-OD-15-102),
+      e.g. a sex-specific disease model. Note the justification in the design document.
+    source: literature
+
+  # --- What counts as a biological replicate ---
+  - id: core.animal.replicate_definition
+    when: {sample.source: {in: [animal_tissue, pdx]}}
+    recommend: {}
+    severity: info
+    rationale: >
+      For animal studies, a biological replicate is an individual animal. Animals in one cage
+      share environment, so spread conditions across cages and litters, and record cage and
+      litter for the batch layout.
+    source: team
+
+  - id: core.organoid.replicate_definition
+    when: {sample.source: organoid}
+    recommend: {}
+    severity: info
+    rationale: >
+      For organoids, independent lines from different donors are the strongest replicates.
+      If only one line is used, replicates are independent passages cultured and treated
+      separately, and conclusions apply to that line only.
+    source: team
+
+  - id: core.sorted_cells.replicate_definition
+    when: {sample.source: sorted_cells}
+    recommend: {}
+    severity: info
+    rationale: >
+      For sorted cells, a biological replicate is an independent sort from a separate
+      animal or donor, not a split of one sort. Record sorting purity and the number of cells
+      per sample, which determines RNA input and library chemistry.
+    ask_if_missing: [sample.input_ng]
+    source: team
+
+  # --- Organisms outside the standard references ---
+  - id: core.organism.other
+    when: {sample.organism: other}
+    recommend: {}
+    severity: info
+    consult: true
+    rationale: >
+      Organisms without a well-annotated reference genome need a consult: alignment,
+      annotation and possibly de novo transcript assembly must be planned before sequencing.
+    source: team

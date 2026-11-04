@@ -1,0 +1,10 @@
+name: Pilot with one sample per group -> blocked
+state:
+  question: {goal: gene_level_de}
+  sample: {organism: human, source: cell_line, preservation: fresh_frozen, rin: 9.7, sex: male}
+  design: {factors: {treatment: [DMSO, drugX]}, biological_replicates_per_group: 1}
+expect:
+  fires: [core.replicates.none, core.replicates.minimum]
+  recommended: {design.biological_replicates_per_group: 3}
+  blocked: true
+  consult_required: true

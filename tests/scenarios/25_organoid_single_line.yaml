@@ -1,0 +1,8 @@
+name: Patient-derived organoids, drug response
+state:
+  question: {goal: gene_level_de}
+  sample: {organism: human, source: organoid, preservation: fresh_frozen, rin: 9.1, sex: female}
+  design: {factors: {treatment: [vehicle, olaparib]}, biological_replicates_per_group: 3}
+expect:
+  fires: [core.organoid.replicate_definition, rnaseq.prep.intact_standard]
+  not_fires: [core.human_subjects, core.cell_line.replicate_definition]

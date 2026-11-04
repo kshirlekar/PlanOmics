@@ -1,0 +1,9 @@
+name: FACS-sorted mouse macrophages, input not yet known
+state:
+  question: {goal: gene_level_de}
+  sample: {organism: mouse, source: sorted_cells, preservation: fresh_frozen, sex: both}
+  design: {factors: {genotype: [WT, KO]}, biological_replicates_per_group: 4}
+expect:
+  fires: [core.sorted_cells.replicate_definition]
+  not_fires: [rnaseq.low_input]
+  missing_includes: [sample.input_ng, design.sex_balanced]

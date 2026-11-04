@@ -1,0 +1,11 @@
+name: 3' tag library for gene-level DE (depth and read layout)
+state:
+  question: {goal: gene_level_de, expected_global_transcription_change: false}
+  sample: {organism: human, source: cell_line, preservation: fresh_frozen, rin: 9}
+  design: {factors: {compound: [c1, c2, c3, c4, c5, c6, c7, DMSO]}, biological_replicates_per_group: 12}
+  library: {prep: three_prime_tag, stranded: true}
+expect:
+  fires: [rnaseq.depth.three_prime_tag]
+  not_fires: [rnaseq.depth.gene_level, rnaseq.prep.three_prime_tag_incompatible, rnaseq.prep.three_prime_tag_option]
+  recommended: {sequencing.target_reads_per_sample: 10000000, sequencing.paired_end: false}
+  consult_required: false

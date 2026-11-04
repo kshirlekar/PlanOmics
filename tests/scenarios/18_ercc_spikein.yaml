@@ -1,0 +1,10 @@
+name: Degron with ERCC spike-ins already chosen -> spike-in amount
+state:
+  question: {goal: gene_level_de, expected_global_transcription_change: true}
+  sample: {organism: human, source: cell_line, preservation: fresh_frozen, rin: 9.6, cell_counts_available: true}
+  design: {factors: {genotype: [WT, dTAG_BRD4], time: [0h, 2h]}, biological_replicates_per_group: 3}
+  library: {prep: rRNA_depletion, stranded: true, spike_in: ERCC_per_cell_number}
+expect:
+  fires: [rnaseq.spikein.global_change, rnaseq.spikein.ercc_fraction]
+  recommended: {library.spike_in: ERCC_per_cell_number, library.spike_in_target_fraction: 0.02}
+  consult_required: false

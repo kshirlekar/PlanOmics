@@ -1,0 +1,9 @@
+name: Whole-blood pre/post, paired, EDTA tubes, pairing unit not yet named
+state:
+  question: {goal: gene_level_de}
+  sample: {organism: human, source: whole_blood, preservation: fresh_frozen, collection_tube: edta}
+  design: {factors: {timepoint: [pre, post]}, biological_replicates_per_group: 10, paired: true}
+expect:
+  fires: [core.design.paired_model, rnaseq.blood.edta_tube, rnaseq.prep.whole_blood_globin, core.sabv.ask]
+  not_fires: [core.design.pairing_question]
+  missing_includes: [design.pairing_factor, sample.sex, project.irb_status]
